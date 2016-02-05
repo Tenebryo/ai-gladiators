@@ -172,7 +172,24 @@ final class Match implements State
       }
       tmp += "," + p.toString();
     }
-    return parseJSONObject("{robot1:\"" + r1n + "\",robot2:\"" + r2n + "\",outcome:" + str(UNPLAYED) + ",title:\""+title+"\",obstacles:[" + tmp + "]}");
+    JSONObject obj = parseJSONObject("{robot1:\"" + r1n + "\",robot2:\"" + r2n + "\",outcome:" + str(UNPLAYED) + ",title:\""+title+"\",obstacles:[" + tmp + "]}");
+    JSONArray arr1 = new JSONArray();
+    int i = 0;
+    for (Action a : m1)
+    {
+      arr1.setJSONObject(i, a.toJSON());
+      i++;
+    }
+    i=0;
+    JSONArray arr2 = new JSONArray();
+    for (Action a : m1)
+    {
+      arr2.setJSONObject(i, a.toJSON());
+      i++;
+    }
+    obj.setJSONArray("robot1Actions", arr1);
+    obj.setJSONArray("robot2Actions", arr2);
+    return obj;
   }
 
   public final boolean isValid(int v)

@@ -54,7 +54,12 @@ final class Action
 
   public String toString()
   {
-    return "{'turnTurret':" +directionToString(a_turnTurret) +",'turnBase':"+directionToString(a_turnBase)+",'move':"+directionToString(a_move)+",'fire':"+str(a_fire)+"}";
+    return "{'turnTurret':'" +directionToString(a_turnTurret) +"','turnBase':'"+directionToString(a_turnBase)+"','move':'"+directionToString(a_move)+"','fire':'"+str(a_fire)+"'}";
+  }
+  
+  public JSONObject toJSON()
+  {
+    return parseJSONObject(this.toString());
   }
 
   public Direction getTurretAction() 
