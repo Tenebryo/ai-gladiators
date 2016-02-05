@@ -776,21 +776,16 @@ final class Match implements State
       {
         pushMatrix();
         {
-          translate(5, 5);
-          drawRobotIntroWithStats(c1, 0, 0, height-150, height-10, color(0, 0, 255));
+          textSize(100);
+          textAlign(LEFT, TOP);
+          fill(0);
+          text("WINNER!",5,5);
+          
+          translate(5, 110);
+          drawRobotIntroWithStats(c1, 0, 0, height-250, height-110, color(0, 0, 255));
         }
         popMatrix();
-
-        push();
-        {
-          translate(width/2, 0);
-          textAlign(CENTER, CENTER);
-          textSize(100);
-          fill(0);
-          text(r1.getName() + "\nWins!", 0, height/4);
-        }
-        pop();
-
+        
         pushMatrix();
         {
           translate(width*2/3-10, height/2-(width/3+140)/2);
@@ -822,8 +817,14 @@ final class Match implements State
 
         pushMatrix();
         {
-          translate(width-height+145, 5);
-          drawRobotIntroWithStats(c2, 0, 0, height-150, height-10, color(255, 0, 0));
+          translate(width-height+245, 5);
+          textSize(100);
+          textAlign(LEFT, TOP);
+          fill(0);
+          text("WINNER!",0,0);
+          
+          translate(0,105);
+          drawRobotIntroWithStats(c2, 0, 0, height-250, height-110, color(255, 0, 0));
         }
         popMatrix();
 

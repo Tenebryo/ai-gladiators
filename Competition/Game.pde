@@ -1,19 +1,19 @@
 /*
    Copyright 2016 Sam Blazes
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
- */
  
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+
 final class Game
 {
   Game() {
@@ -21,7 +21,7 @@ final class Game
 
   private int matchValidator = 0; //no one can add invalid matches
   private String currentTournament;
-  
+
   private PImage defaultAvatar;
 
   private ArrayList<Class> robots;
@@ -37,7 +37,29 @@ final class Game
 
   void setup(ArrayList<Class> r)
   {
-    gameLog = loadJSONObject("./data/games/game.json");
+    while (true) 
+    {
+      try 
+      {
+        gameLog = loadJSONObject("./data/games/game.json");
+        break;
+      }
+      catch(NullPointerException e)
+      {
+        //game.json was not in the games folder
+        //replace it with new one
+        try
+        {
+          saveStrings("./data/games/game.json", loadStrings("./data/game.json"));
+        }
+        catch(Exception e)
+        {
+          //real problems now
+          println("ERROR: Unable to find game log template file, or unable to write file new one, exiting.");
+          exit();
+        }
+      }
+    }
 
     matchValidator = new Random().nextInt();
 
@@ -46,8 +68,8 @@ final class Game
     matches = new ArrayList<Match>();
     stateQueue = new ArrayList<State>();
     robots = r;
-    
-    defaultAvatar = loadImage(pathJoin(".\\data","defaultAvatar.png"));
+
+    defaultAvatar = loadImage(pathJoin(".\\data", "defaultAvatar.png"));
 
     println(robots);
 
@@ -63,12 +85,12 @@ final class Game
         robots.remove(i);
       }
     }
-    
+
     //run initialization code for all robots
-    for(Class rb : robots)
+    for (Class rb : robots)
     {
       Robot tmp = getRobotInstance(rb);
-      if(tmp != null)
+      if (tmp != null)
       {
         tmp.initialize();
       }
@@ -261,35 +283,33 @@ final class Game
     Collections.reverse(robotList);
     return robotList;
   }
-  
-  public Pair<Integer,Pair<Integer,Integer>> getRobotScore(Class r)
+
+  public Pair<Integer, Pair<Integer, Integer>> getRobotScore(Class r)
   {
-    if(scores.containsKey(r))
+    if (scores.containsKey(r))
     {
       return scores.get(r);
-    }
-    else
+    } else
     {
-      return new Pair<Integer,Pair<Integer, Integer>>(0, new Pair<Integer, Integer>(0,0));
+      return new Pair<Integer, Pair<Integer, Integer>>(0, new Pair<Integer, Integer>(0, 0));
     }
   }
-  
+
   public void setRobotAvatar(Class robot, String p)
   {
-    if(!avatars.containsKey(robot))
+    if (!avatars.containsKey(robot))
     {
-      PImage pi = loadImage(pathJoin(pathJoin("./data/",getRobotName(robot)),p));
+      PImage pi = loadImage(pathJoin(pathJoin("./data/", getRobotName(robot)), p));
       avatars.put(robot, pi);
     }
   }
-  
+
   public PImage getRobotAvatar(Class robot)
   {
-    if(avatars.containsKey(robot))
+    if (avatars.containsKey(robot))
     {
       return avatars.get(robot);
-    } 
-    else 
+    } else 
     {
       return defaultAvatar;
     }

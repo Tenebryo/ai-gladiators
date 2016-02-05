@@ -39,7 +39,4 @@ This is the documentation of the functions provided to the competitor as utiliti
   * Adjacent Area
    * `String[] getNearbyObjects()`
     * Returns a list of the objects in the 6 adjacent hexagons to your robot. The list index is the absolute direction of the hexagon from your robot.
-  * Telemtry
-   * Location
-   * Robot Health
 * Utility Functions
