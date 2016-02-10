@@ -52,7 +52,7 @@ final class Game
         {
           saveStrings("./data/games/game.json", loadStrings("./data/game.json"));
         }
-        catch(Exception e)
+        catch(Exception e1)
         {
           //real problems now
           println("ERROR: Unable to find game log template file, or unable to write file new one, exiting.");
@@ -241,7 +241,7 @@ final class Game
         scores.get(m.c1).one++;
         JSONObject loser = log.getJSONObject("robots").getJSONObject(m.c2.getName());
         loser.setInt("losses", loser.getInt("losses")+1);
-        scores.get(m.c1).two.two++;
+        scores.get(m.c2).two.two++;
       } else if (m.result == m.R2WIN)
       {
         log.getJSONObject("matches").getJSONObject(m.id).setInt("outcome", m.R2WIN);

@@ -40,7 +40,6 @@ public class SimpleRobot extends Robot
 public class RandomRobot extends Robot
 {
   int tick = -1;
-  ArrayList<Integer> moves = new ArrayList();
   public RandomRobot() {
     super();
   }

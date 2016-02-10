@@ -361,7 +361,7 @@ final class Match implements State
     boolean f1=false, f2=false;
     try
     {
-      r1=new Robot().getClass().cast(c1.getDeclaredConstructor(new RobotGame().getClass()).newInstance(mainPApplet));
+      r1=new Robot().getClass().cast(c1.getDeclaredConstructor(new Competition().getClass()).newInstance(mainPApplet));
       r1.setMatch(this);
     }
     catch(Throwable e)
@@ -371,7 +371,7 @@ final class Match implements State
     }
     try
     {
-      r2=new Robot().getClass().cast(c2.getDeclaredConstructor(new RobotGame().getClass()).newInstance(mainPApplet));
+      r2=new Robot().getClass().cast(c2.getDeclaredConstructor(new Competition().getClass()).newInstance(mainPApplet));
       r2.setMatch(this);
     }
     catch(Throwable e)

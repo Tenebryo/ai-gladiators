@@ -1,17 +1,17 @@
 /*
    Copyright 2016 Sam Blazes
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
  */
 
 import java.util.*;
@@ -22,46 +22,45 @@ final Game game = new Game();
 final PApplet mainPApplet = this;
 Match m;
 
-final boolean debug = true;
-void debug(Object... params)
-{
-  if (debug)
-    println(params);
-}
+boolean singleMatch = true;
 
 void setup()
 {
   frameRate(60);
   size(1600, 900);
   game.setup(new ArrayList(Arrays.asList(this.getClass().getDeclaredClasses())));
-  //m = new Match(new BasicAIRobot().getClass(), new BasicAIRobot().getClass(), "Test Match 1", 0);
+  
+  m = new Match(new BasicAIRobot().getClass(), new RandomRobot().getClass(), "Test Match 1", 0);
 }
 
 int stat = 0;
 
 void draw()
 {
-  /*
-  int t=0;
-  switch(stat)
+  if (singleMatch)
   {
-  case 0:
-    t = (m.stateStart()?stat++:stat);
-    break;
-  case 1:
-    t = (m.stateStep()?stat++:stat);
-    break;
-  case 2:
-    t = (m.stateEnd()?stat++:stat);
-    break;
-  }//*/
-  //m.stateStep();
-  game.draw();
+    int t=0;
+    switch(stat)
+    {
+    case 0:
+      t = (m.stateStart()?stat++:stat);
+      break;
+    case 1:
+      t = (m.stateStep()?stat++:stat);
+      break;
+    case 2:
+      t = (m.stateEnd()?stat++:stat);
+      break;
+    }
+  } else
+  {
+    game.draw();
+  }
 }
 
 void keyPressed()
 {
-  for(HumanControlledRobot p : instances)
+  for (HumanControlledRobot p : instances)
   {
     p.keyPressed(key);
   }
@@ -176,10 +175,10 @@ Pair<Integer, Integer> getIncrementedPosition(int q, int r, int direction)
 ArrayList<Pair<Integer, Integer>> getAdjacentHexes(int q, int r)
 {
   ArrayList<Pair<Integer, Integer>> ret = new ArrayList<Pair<Integer, Integer>>();
-  
-  for(int i = 0; i < 6; i++)
+
+  for (int i = 0; i < 6; i++)
   {
-    ret.add(getIncrementedPosition(q,r,i));
+    ret.add(getIncrementedPosition(q, r, i));
   }
   return ret;
 }
@@ -221,9 +220,9 @@ void reset()
 
 String pathJoin(String path1, String path2)
 {
-    File file1 = new File(path1);
-    File file2 = new File(file1, path2);
-    return file2.getPath();
+  File file1 = new File(path1);
+  File file2 = new File(file1, path2);
+  return file2.getPath();
 }
 
 String getRobotName(Class t)
@@ -234,51 +233,50 @@ String getRobotName(Class t)
 void drawRobotName(Class r, int x, int y, int w, int h)
 {
   String name = getRobotName(r);
-  
-  PGraphics pg = createGraphics(w,h);
-  
+
+  PGraphics pg = createGraphics(w, h);
+
   pg.beginDraw();
-  
+
   pg.textSize(h);
   pg.fill(0);
-  pg.textAlign(LEFT,TOP);
-  
-  pg.text(name,0,0);
-  
+  pg.textAlign(LEFT, TOP);
+
+  pg.text(name, 0, 0);
+
   pg.endDraw();
-  
-  image(pg,x,y);
+
+  image(pg, x, y);
 }
 
 Robot getRobotInstance(Class r)
 {
-    try
-    {
-      return new Robot().getClass().cast(r.getDeclaredConstructor(new RobotGame().getClass()).newInstance(mainPApplet));
-    }
-    catch(Throwable e)
-    {
-      return null;
-    }
+  try
+  {
+    return new Robot().getClass().cast(r.getDeclaredConstructor(new Competition().getClass()).newInstance(mainPApplet));
+  }
+  catch(Throwable e)
+  {
+    return null;
+  }
 }
 
 void drawRobotIntro(Class r, int x, int y, int w, int h, color c)
 {
   push();
   {
-    translate(x,y);
-    
+    translate(x, y);
+
     noStroke();
     fill(c);
-    
-    rect(0,0,w,h);
-    
+
+    rect(0, 0, w, h);
+
     drawRobotName(r, 5, 5, w-10, 40);
-    
-    translate(0,50);
-    
+
+    translate(0, 50);
+
     image(game.getRobotAvatar(r), 5, 5, w-10, h-60);
-    
   }
   pop();
 }
@@ -286,30 +284,30 @@ void drawRobotIntro(Class r, int x, int y, int w, int h, color c)
 void drawRobotIntroWithStats(Class r, int x, int y, int w, int h, color c)
 {
   drawRobotIntro(r, x, y, w, h-100, c);
-  
+
   Pair<Integer, Pair<Integer, Integer>> s = game.getRobotScore(r);
   push();
   {
-    translate(0,h-100);
+    translate(0, h-100);
     noStroke();
     strokeWeight(2);
-    
+
     fill(150);
     rect(0, 0, w, 100);
-    
+
     fill(0);
-    
+
     textSize(40);
     textAlign(CENTER, BOTTOM);
-    text("W",w/4,45);
-    text("D",w/2,45);
-    text("L",w*3/4,45);
-    
+    text("W", w/4, 45);
+    text("D", w/2, 45);
+    text("L", w*3/4, 45);
+
     textSize(30);
     textAlign(CENTER, TOP);
-    text(str(s.one),w/4,55);
-    text(str(s.two.one),w/2,55);
-    text(str(s.two.two),w*3/4,55);
+    text(str(s.one), w/4, 55);
+    text(str(s.two.one), w/2, 55);
+    text(str(s.two.two), w*3/4, 55);
   }
   pop();
 }

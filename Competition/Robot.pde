@@ -63,7 +63,7 @@ public class Robot
 
   public final void takeDamage(int dmg)
   {
-    hp-=dmg;
+    hp-=abs(dmg);
   }
 
   public final int getP()
