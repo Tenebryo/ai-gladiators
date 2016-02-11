@@ -1,17 +1,17 @@
 /*
    Copyright 2016 Sam Blazes
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
  */
 
 int nextMatchId = 0;
@@ -32,6 +32,8 @@ final class Match implements State
   boolean matchOver = false;
   String id, title;
   final int gridSize = 10;
+  
+  PGraphics stage = null;
 
   Pair<Integer, Integer> lp1 = new Pair<Integer, Integer>(0, 0), lp2 = new Pair<Integer, Integer>(0, 0);
 
@@ -50,8 +52,10 @@ final class Match implements State
   final SignalableThread<Boolean> _1 = new SignalableThread<Boolean>() {
 
     public void signal(Boolean v) {
+      if (signalVal != v) {
+        a1.value = new Action();
+      }
       signalVal=v;
-      a1.value = new Action();
     }
 
     public void run() {
@@ -81,8 +85,10 @@ final class Match implements State
   final SignalableThread<Boolean> _2 = new SignalableThread<Boolean>() {
 
     public void signal(Boolean v) {
+      if (signalVal != v) {
+        a2.value = new Action();
+      }
       signalVal=v;
-      a2.value = new Action();
     }
 
     public void run() {
@@ -228,7 +234,7 @@ final class Match implements State
       int r = p.two;
       qu.remove(0);
 
-      for (Pair<Integer, Integer> pos : getAdjacentHexes(q, r))
+      for (Pair<Integer, Integer> pos : getAdjacentTiles(q, r))
       {
         if (pos.one == -gridSize && pos.two == 0)
         {
@@ -412,12 +418,36 @@ final class Match implements State
     return t_endTimer == 0;
   }
 
-  public PVector getHexCoord(int q, int r)
-  {
-    float mult = 2;
-    PVector b1 = PVector.mult(PVector.fromAngle(0), 20);
-    PVector b2 = PVector.mult(PVector.fromAngle(PI/3), 20);
-    return PVector.add(PVector.mult(b1, mult*q), PVector.mult(b2, mult*r));
+  private void drawArena() {
+    if(stage == null) {
+      stage = createGraphics(width, height);
+      stage.beginDraw();
+      
+      stage.translate(width/2.0, height/2.0);
+      
+      stage.noStroke();
+      stage.fill(255);
+      hexagon(0,0, 500, stage);
+      
+      stage.noStroke();
+      stage.fill(150, 100);
+      for (int i = -gridSize; i <= gridSize; i++)
+      {
+        for (int j = -gridSize; j <= gridSize; j++)
+        {
+          if (abs(i+j) <= gridSize)
+          {
+            PVector t = getHexCoord(i, j);
+            hexagon(t.x, t.y, 21, stage);
+          }
+        }
+      }
+      stage.endDraw();
+    }
+    push();
+    reset();
+    image(stage,0,0);
+    pop();
   }
 
   public void draw(float interp)
@@ -425,10 +455,6 @@ final class Match implements State
     pushMatrix();
     {
       gameBackground();
-
-      noStroke();
-      fill(255);
-      hexagon(width/2, height/2, 500);
 
       //display remaining turns
       fill(0);
@@ -443,21 +469,9 @@ final class Match implements State
       translate(width/2, height/2);
       //scale(2);
 
-      noStroke();
-      fill(150, 100);
 
       //display grid
-      for (int i = -gridSize; i <= gridSize; i++)
-      {
-        for (int j = -gridSize; j <= gridSize; j++)
-        {
-          if (abs(i+j) <= gridSize)
-          {
-            PVector t = getHexCoord(i, j);
-            hexagon(t.x, t.y, 21);
-          }
-        }
-      }
+      drawArena();
 
       //display projectiles
       for (Projectile p : projectiles)
@@ -619,52 +633,18 @@ final class Match implements State
       matchOver = true;
       return false;
     }
-
-    if (tick%2==0 && tick > 30)
-    {
-      remainingTurns--;
-
-      _1.signal(true);
-      _2.signal(true);
-    }
-
-    if (a1.value != null) 
-    {
-      if (a1.value.getFireAction() && r1FireCooldown > 6)
-      {
-        projectiles.add(new Projectile(r1.getQ(), r1.getR(), r1.getTurretHeading(), 1));
-        r1FireCooldown = 0;
-      }
-      m1.add(a1.value);
-    } else
-    {
-      m1.add(new Action());
-    }
-    if (a2.value != null) {
-      if (a2.value.getFireAction() && r2FireCooldown > 6)
-      {
-        projectiles.add(new Projectile(r2.getQ(), r2.getR(), r2.getTurretHeading(), 2));
-        r2FireCooldown = 0;
-      }
-      m2.add(a2.value);
-    } else
-    {
-      m2.add(new Action());
-    }
-    r1FireCooldown++;
-    r2FireCooldown++;
-
+    
     //update bullets
     ArrayList<Projectile> rem = new ArrayList<Projectile>();
     for (Projectile p : projectiles)
     {
       p.step();
-      if (p.q == r1.getQ() && p.r == r1.getR())
+      if (p.p == 2 && (p.q == r1.getQ() && p.r == r1.getR() || p.lq == r1.getQ() && p.lr == r1.getR()))
       {
         r1.takeDamage(int(random(damage_min, damage_max)));
         rem.add(p);
       }
-      if (p.q == r2.getQ() && p.r == r2.getR())
+      if (p.p == 1 && (p.q == r2.getQ() && p.r == r2.getR() || p.lq == r2.getQ() && p.lr == r2.getR()))
       {
         r2.takeDamage(int(random(damage_min, damage_max)));
         rem.add(p);
@@ -687,6 +667,44 @@ final class Match implements State
     for (Projectile p : rem)
     {
       projectiles.remove(p);
+    }
+
+    if (tick%2==0 && tick > 30)
+    {
+      if (a1.value != null && !_1.getVal()) 
+      {
+        if (a1.value.getFireAction() && r1FireCooldown > 3)
+        {
+          projectiles.add(new Projectile(r1.getQ(), r1.getR(), r1.getTurretHeading(), 1));
+          r1FireCooldown = 0;
+        }
+        r1.update(a1.value);
+        m1.add(a1.value);
+      } else
+      {
+        m1.add(new Action());
+      }
+      
+      if (a2.value != null && !_2.getVal()) {
+        if (a2.value.getFireAction() && r2FireCooldown > 3)
+        {
+          projectiles.add(new Projectile(r2.getQ(), r2.getR(), r2.getTurretHeading(), 2));
+          r2FireCooldown = 0;
+        }
+        r2.update(a2.value);
+        m2.add(a2.value);
+      } else
+      {
+        m2.add(new Action());
+      }
+      
+      
+      remainingTurns--;
+      r1FireCooldown++;
+      r2FireCooldown++;
+
+      _1.signal(true);
+      _2.signal(true);
     }
 
     //check game for end conditions
@@ -794,15 +812,15 @@ final class Match implements State
         pushMatrix();
         {
           textSize(100);
-          textAlign(LEFT, TOP);
+          textAlign(CENTER, TOP);
           fill(0);
-          text("WINNER!",5,5);
-          
+          text("WINNER!", 5+(height-250)/2.0, 5);
+
           translate(5, 110);
           drawRobotIntroWithStats(c1, 0, 0, height-250, height-110, color(0, 0, 255));
         }
         popMatrix();
-        
+
         pushMatrix();
         {
           translate(width*2/3-10, height/2-(width/3+140)/2);
@@ -822,25 +840,15 @@ final class Match implements State
         }
         popMatrix();
 
-        push();
-        {
-          translate(width/2, 0);
-          textAlign(CENTER, CENTER);
-          textSize(100);
-          fill(0);
-          text(r2.getName() + "\nWins!", 0, height/4);
-        }
-        pop();
-
         pushMatrix();
         {
           translate(width-height+245, 5);
           textSize(100);
-          textAlign(LEFT, TOP);
+          textAlign(CENTER, TOP);
           fill(0);
-          text("WINNER!",0,0);
-          
-          translate(0,105);
+          text("WINNER!", (height-245)/2.0, 0);
+
+          translate(0, 105);
           drawRobotIntroWithStats(c2, 0, 0, height-250, height-110, color(255, 0, 0));
         }
         popMatrix();
@@ -873,6 +881,11 @@ final class Match implements State
 class SignalableThread<T> extends Thread {
 
   protected T signalVal;
+
+  public T getVal() {
+    return signalVal;
+  }
+
   public void signal(T v) {
   }
 }

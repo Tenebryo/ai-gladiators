@@ -17,13 +17,18 @@
 public class Robot
 {
   private String name = "";
-  private int bh, th, hp = 100, q, r, pl, lq, lr;
+  private int bh, th, hp = 100, q, r, pl, lq, lr, drawTick = 0;
   private Match match = null;
   private int bturn = 0, tturn = 0, move = 0;
+  
+  private ArrayList<PVector> particles = new ArrayList();
 
   public Robot()
   {
     name = match(this.getClass().getName(), "\\$(.*)")[1];
+    for(int i = 0; i < 15; i++) {
+      particles.add(new PVector(0,0,random(0,20)));
+    }
   }
 
   public void setMatch(Match m)
@@ -65,12 +70,7 @@ public class Robot
   {
     hp-=abs(dmg);
   }
-
-  public final int getP()
-  {
-    return -q-r;
-  }
-
+  
   public final int getQ()
   {
     return q;
@@ -114,7 +114,7 @@ public class Robot
 
       rotate(bh*PI/3.0);
       translate(move*(-40+40*interp), 0);
-
+      
       rotate(bturn*(1-interp)*PI/3.0);
 
       beginShape();
@@ -146,6 +146,34 @@ public class Robot
         vertex(6, -2);
       }
       endShape(CLOSE);
+      
+      if(getHp() < 60)
+      {
+        noStroke();
+        translate(-10,0);
+        ArrayList<PVector> forRemoval = new ArrayList();
+        for(PVector p : particles) {
+          fill(
+            255-map(hp,0,50,0,155),
+            map(hp, 0, 100, 0, 100), 
+            map(hp, 0, 100, 0, 100),
+            150
+          );
+          ellipse(p.x, p.y, (20-p.z), (20-p.z));
+          if(p.z >= 20) {
+            forRemoval.add(p);
+          } else {
+            p.x += random(-2,2);
+            p.y += random(-2,2);
+            p.z += 0.5;
+          }
+        }
+        for(PVector p : forRemoval) {
+          p.x = 0;
+          p.y = 0;
+          p.z = 0;
+        }
+      }
     }
     popMatrix();
   }
@@ -154,16 +182,17 @@ public class Robot
   {
     initialize();
   }
-
-  public synchronized final Action step()
+  
+  public synchronized final void update(Action a)
   {
-    Action a = new Action();
+    if (a == null) {
+      return;
+    }
+    
     move = 0;
     bturn = 0;
     tturn = 0;
-
-    action(a);
-
+    
     if (a.getTurretAction() == Left) {
       th = (th+5)%6; 
       tturn = 1;
@@ -218,6 +247,14 @@ public class Robot
         move = (a.getMoveAction()==Forward?1:-1);
       }
     }
+  }
+
+  public synchronized final Action step()
+  {
+    Action a = new Action();
+
+    action(a);
+
     return a;
   }
 

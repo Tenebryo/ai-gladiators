@@ -99,7 +99,7 @@ public class BasicAIRobot extends Robot
       }
     }
     String[] s = getNearbyObjects();
-    if (s[turnRight(getBaseHeading())]=="Nothing")
+    if (s[getDirectionRightOf(getBaseHeading())]=="Nothing")
     {
       move.turnRight();
     } else if (s[getBaseHeading()]=="Nothing")

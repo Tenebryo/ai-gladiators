@@ -24,12 +24,14 @@ Match m;
 
 boolean singleMatch = true;
 
+PGraphics preBackground = null;
+
 void setup()
 {
   frameRate(60);
   size(1600, 900);
   game.setup(new ArrayList(Arrays.asList(this.getClass().getDeclaredClasses())));
-  
+
   m = new Match(new BasicAIRobot().getClass(), new RandomRobot().getClass(), "Test Match 1", 0);
 }
 
@@ -81,6 +83,21 @@ void hexagon(float x, float y, float r)
   endShape(CLOSE);
   popMatrix();
 }
+void hexagon(float x, float y, float r, PGraphics pg)
+{
+  pg.pushMatrix();
+  pg.translate(x, y);
+  pg.rotate(PI/6);
+  pg.beginShape();
+  pg.vertex(r, 0);
+  pg.vertex(r/2, -sqrt(3)/2*r);
+  pg.vertex(-r/2, -sqrt(3)/2*r);
+  pg.vertex(-r, 0);
+  pg.vertex(-r/2, sqrt(3)/2*r);
+  pg.vertex(r/2, sqrt(3)/2*r);
+  pg.endShape(CLOSE);
+  pg.popMatrix();
+}
 
 int getIntDirectionFromString(String direction)
 {
@@ -118,12 +135,12 @@ int getIntDirectionFromString(String direction)
   }
 }
 
-int turnRight(int h) 
+int getDirectionRightOf(int h) 
 {
   return (h+1)%6;
 }
 
-int turnLeft(int h) 
+int getDirectionLeftOf(int h) 
 {
   return (h+5)%6;
 }
@@ -172,7 +189,7 @@ Pair<Integer, Integer> getIncrementedPosition(int q, int r, int direction)
   return new Pair<Integer, Integer>(q, r);
 }
 
-ArrayList<Pair<Integer, Integer>> getAdjacentHexes(int q, int r)
+ArrayList<Pair<Integer, Integer>> getAdjacentTiles(int q, int r)
 {
   ArrayList<Pair<Integer, Integer>> ret = new ArrayList<Pair<Integer, Integer>>();
 
@@ -185,18 +202,25 @@ ArrayList<Pair<Integer, Integer>> getAdjacentHexes(int q, int r)
 
 void gameBackground()
 {
-  pushMatrix();
-  {
-    noStroke();
-    translate(width/2, height/2);
-    rotate(PI/6);
+  if(preBackground == null) {
+    preBackground = createGraphics(width,height);
+    preBackground.beginDraw();
+    preBackground.noStroke();
+    preBackground.translate(width/2, height/2);
+    preBackground.rotate(PI/6);
     for (int i = 1000; i >= 0; i-=100)
     {
-      fill(255, 150, 0);
-      hexagon(0, 0, 150+i);
-      fill(255, 255, 0);
-      hexagon(0, 0, 100+i);
+      preBackground.fill(255, 150, 0);
+      hexagon(0, 0, 150+i, preBackground);
+      preBackground.fill(255, 255, 0);
+      hexagon(0, 0, 100+i, preBackground);
     }
+    preBackground.endDraw();
+    
+  }
+  pushMatrix();
+  {
+    image(preBackground,0,0);
   }
   popMatrix();
 }
@@ -216,6 +240,14 @@ void pop()
 void reset()
 {
   resetMatrix();
+}
+
+public PVector getHexCoord(int q, int r)
+{
+  float mult = 2;
+  PVector b1 = PVector.mult(PVector.fromAngle(0), 20);
+  PVector b2 = PVector.mult(PVector.fromAngle(PI/3), 20);
+  return PVector.add(PVector.mult(b1, mult*q), PVector.mult(b2, mult*r));
 }
 
 String pathJoin(String path1, String path2)

@@ -16,19 +16,19 @@
 
 class Projectile
 {
-  public int q, r, h, p;
+  public int q, r, h, p, lq, lr;
 
   public Projectile(int qq, int rr, int hh, int pp)
   {
-    q = qq;
-    r = rr;
+    lq = q = qq;
+    lr = r = rr;
     h = hh;
     p = pp;
   }
 
   public void step()
   {
-    int nq = q, nr = r;
+    int nq = lq = q, nr = lr = r;
     switch(h)
     {
     case 0: 
@@ -68,7 +68,7 @@ class Projectile
       }
 
       rotate(h*PI/3.0);
-      translate(-40+40*interp,0);
+      translate(40*interp,0);
 
       beginShape();
       {

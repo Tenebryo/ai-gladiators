@@ -213,7 +213,7 @@ final class Game
   }
 
   float getCompetitionScoreFromPair(Pair<Integer, Pair<Integer, Integer>> pair) {
-    return pair.one + pair.two.one/2.0;
+    return pair.one + pair.two.one/2.0 - pair.two.two/4.0;
   }
 
   void logMatchOutcome(Match m)
