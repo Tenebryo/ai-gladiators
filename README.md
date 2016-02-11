@@ -133,8 +133,6 @@ public class BasicAIRobot extends Robot
 {
   public BasicAIRobot() {
     super();
-
-    //setImage("http://i.imgur.com/343yJj6.jpg");
   }
 
   boolean nextMove = true;
