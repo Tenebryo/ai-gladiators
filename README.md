@@ -1,4 +1,4 @@
-# ai-gladiators
+#Artificial Intelligence Gladiator Tournament
 A simple game pitting two AI-controlled tanks against each other in a round-robin match-based tournament.
 
 ##Rules
