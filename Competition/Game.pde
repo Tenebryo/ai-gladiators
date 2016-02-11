@@ -20,7 +20,6 @@ final class Game
   };
 
   private int matchValidator = 0; //no one can add invalid matches
-  private String currentTournament;
 
   private PImage defaultAvatar;
 
@@ -123,7 +122,6 @@ final class Game
 
       for (Class t : robots)
       {
-        println(t.getName());
         scores.put(t, new Pair<Integer, Pair<Integer, Integer>>(0, new Pair<Integer, Integer>(0, 0)));
         gameLog.getJSONArray("robotNames").append(t.getName());
         gameLog.getJSONObject("robots").setJSONObject(t.getName(), parseJSONObject("{wins:0,draws:0,losses:0}"));

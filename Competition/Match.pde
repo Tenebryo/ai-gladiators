@@ -144,7 +144,6 @@ final class Match implements State
           obstacles.remove(t1);
           obstacles.remove(t2);
         } else {
-          println(q, r);
           break;
         }
       }
@@ -228,7 +227,6 @@ final class Match implements State
 
     while (qu.size()>0)
     {
-      println(qu);
       Pair<Integer, Integer> p = qu.get(0);
       int q = p.one;
       int r = p.two;
