@@ -86,6 +86,10 @@ final class Action
       a_turnBase = dir;
       a_move = None;
     }
+    else if (dir == None) 
+    {
+      a_turnBase = dir;
+    }
   }
 
   public void turnRight()
@@ -100,7 +104,7 @@ final class Action
 
   public void turnTurret(Direction dir)
   {
-    if (dir == Left || dir == Right)
+    if (dir == Left || dir == Right || dir == None)
     {
       a_turnTurret = dir;
     }
@@ -168,6 +172,8 @@ final class Action
     {
       a_move = dir;
       a_turnBase = None;
+    } else if (dir == None) {
+      a_move = dir;
     }
   }
 
